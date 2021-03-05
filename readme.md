@@ -1,15 +1,15 @@
 # Reading messages from Azure event grid and sending message to MS Teams
 
-Data loads and moniroting needs proactive and timely monitoring. Archiving this it is need to follow up on loads and any fails and errors. This logic app enable you to follow event grid messages that are sent by [ADE](https://www.solita.fi/en/agiledataengine/).
+Data loads and moniroting needs proactive and timely monitoring. Archiving this, it is need to follow up on loads and any fails and errors. This logic app enable you to follow event grid messages that are sent by [ADE](https://www.solita.fi/en/agiledataengine/).
 
 ## Requierments
 
-Azure account 
-Altleas one ADE environment in Azure
-Possibility to create resources 
-Resource group
-Logic app
-Created eventgrid connection(created before hand)
++ Azure account 
++ Altleas one ADE environment in Azure
++ Possibility to create resources 
++ Resource group
++ Logic app
++ Created eventgrid connection(created before hand)
 
 
 ## How to deploy 
@@ -42,10 +42,10 @@ az deployment group create \
 
 ## Contributing
 
-Feedback and everything else is always welcome. 
++ Feedback and everything else is always welcome. 
 
-Some Design work would be nice 
++ Some Design work would be nice 
 
-Initial work:
++ Initial work:
 
 Kaarel Kõrvemaa 
