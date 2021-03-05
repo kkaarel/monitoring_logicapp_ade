@@ -1,0 +1,194 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "logicappname": {
+            "type": "String"
+        },
+        "topic_externalid": {
+            "type": "String"
+        },
+        "connections_externalid": {
+            "type": "String"
+        },
+        "ENV": {
+          "type": "string"
+        },
+        "connectionid": {
+          "type": "string"
+        },
+        "azureeventgrid_Connection": {
+          "type": "string"
+        },
+        "tagEnv": {
+          "type": "string"
+        },
+        "webhook": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[parameters('logicappname')]",
+            "location": "westeurope",
+            "tags": {
+                "Application Purpose": "",
+                "Business Owner": "",
+                "Cost Centre": "",
+                "Creator": "",
+                "Environment": "[parameters('tagEnv')]",
+                "Owner": "",
+                "Partner": "",
+                "Project Name": ""
+            },
+            "properties": {
+                "state": "Enabled",
+                "definition": {
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "staticResults": {
+                        "HTTP_20": {
+                            "status": "Succeeded",
+                            "outputs": {
+                                "headers": {},
+                                "statusCode": "OK"
+                            }
+                        }
+                    },
+                    "triggers": {
+                        "When_a_resource_event_occurs": {
+                            "splitOn": "@triggerBody()",
+                            "type": "ApiConnectionWebhook",
+                            "inputs": {
+                                "body": {
+                                    "properties": {
+                                        "destination": {
+                                            "endpointType": "webhook",
+                                            "properties": {
+                                                "endpointUrl": "@{listCallbackUrl()}"
+                                            }
+                                        },
+                                        "topic": "[parameters('topic_externalid')]"
+                                    }
+                                },
+                                "host": {
+                                    "connection": {
+                                        "name": "@parameters('$connections')['azureeventgrid']['connectionId']"
+                                    }
+                                },
+                                "path": "[parameters('path')]",
+                                "queries": {
+                                    "x-ms-api-version": "2017-09-15-preview"
+                                }
+                            }
+                        }
+                    },
+                    "actions": {
+                        "Condition": {
+                            "actions": {
+                                "HTTP_2": {
+                                    "runAfter": {},
+                                    "type": "Http",
+                                    "inputs": {
+                                        "body": {
+                                            "markdown": false,
+                                            "text": "**&#9940**<br><br> **Environment:**  @{variables('ENV')} <br><br> **ADE Load:** @{triggerBody()?['eventType']} <br><br> **DAG name:** @{triggerBody()['subject']} <br><br> **Event time**: @{triggerBody()['eventTime']} <br><br> **Message:**  @{triggerBody()['data']['message']}",
+                                            "type": "TextBlock"
+                                        },
+                                        "headers": {
+                                            "Content-Type": "application/json"
+                                        },
+                                        "method": "POST",
+                                        "uri": "@variables('Alert URI')"
+                                    },
+                                    "runtimeConfiguration": {
+                                        "staticResult": {
+                                            "staticResultOptions": "Disabled",
+                                            "name": "HTTP_20"
+                                        }
+                                    }
+                                }
+                            },
+                            "runAfter": {
+                                "Initialize_variable_2": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "expression": {
+                                "or": [
+                                    {
+                                        "equals": [
+                                            "@triggerBody()?['eventType']",
+                                            "ENDED_FAILED"
+                                        ]
+                                    },
+                                    {
+                                        "equals": [
+                                            "@triggerBody()?['eventType']",
+                                            "ENDED_SMOKE_FAILED"
+                                        ]
+                                    }
+                                ]
+                            },
+                            "type": "If"
+                        },
+                        "Initialize_variable": {
+                            "runAfter": {},
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "ENV",
+                                        "type": "string",
+                                        "value": "[parameters('ENV')]"
+                                    }
+                                ]
+                            }
+                        },
+                        "Initialize_variable_2": {
+                            "runAfter": {
+                                "Initialize_variable": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "type": "InitializeVariable",
+                            "inputs": {
+                                "variables": [
+                                    {
+                                        "name": "Alert URI",
+                                        "type": "string",
+                                        "value": "[parameters('webhook')]"
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {
+                            "azureeventgrid": {
+                                "connectionId": "[parameters('connections_externalid')]",
+                                "connectionName": "[parameters('azureeventgrid_Connection')]",
+                                "id": "[parameters('connectionid')]"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

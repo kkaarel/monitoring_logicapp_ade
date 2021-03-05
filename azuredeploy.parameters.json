@@ -1,0 +1,34 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "logicappname": {
+      "value": "monitoring-ade-d"
+    },
+    "azureeventgrid_Connection":{
+      "value": "azureeventgrid"
+    },
+    "ENV":{
+      "value": "DEV"
+    },
+    "connectionid":{
+      "value": "/subscriptions/<subscription>/providers/Microsoft.Web/locations/westeurope/managedApis/azureeventgrid"
+    },
+    "tagEnv": {
+        "value": "d" 
+    },
+    "topic_externalid":{
+      "value": "/subscriptions/<subscription>/resourceGroups/<ResourceGroup>/providers/Microsoft.EventGrid/topics/bfaderd-statistics-topic"
+    },
+    "connections_externalid":{
+      "value": "/subscriptions/<subscription>/resourceGroups/rg-euw-dataplatform-logicapp-d/providers/Microsoft.Web/connections/azureeventgrid"
+
+    },
+    "webhook":{
+      "value": ""
+    },
+    "path": {
+        "value": "/subscriptions/@{encodeURIComponent('<subscription>')}/providers/@{encodeURIComponent('Microsoft.EventGrid.Topics')}/resource/eventSubscriptions" 
+    }
+  }
+}
